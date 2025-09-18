@@ -1,10 +1,11 @@
 import { FaGithub, FaLinkedin, FaDownload } from 'react-icons/fa';
 import { MdEmail } from 'react-icons/md';
+import profileImage from '../../assets/images/ME.png';
+import resumePDF from '../../assets/resume/Yash_Mishra_Resume.pdf';
 
 function Home() {
   const handleDownloadResume = () => {
-    // Replace with your actual resume file path
-    const resumeUrl = '/src/assets/resume/Yash_Mishra_Resume.pdf';
+    const resumeUrl = resumePDF;
     const link = document.createElement('a');
     link.href = resumeUrl;
     link.download = 'Yash_Mishra_Resume.pdf';
@@ -88,7 +89,7 @@ function Home() {
         <div className="w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden shadow-2xl">
           <div className="w-full h-full bg-gray-700 flex items-center justify-center text-white">
             <img 
-              src="/src/assets/images/ME.png" 
+              src={profileImage}
               alt="Yash Mishra - Front-end Developer" 
               className="w-full h-full object-cover"
             />
