@@ -1,0 +1,137 @@
+@import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+}
+
+html, body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+* {
+  box-sizing: border-box; /* Ensure padding and borders are included in element width/height */
+}
+
+.navbar {
+  background: transparent;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem;
+  position: fixed; /* Changed from sticky to fixed */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  transition: all 0.3s ease-in-out; /* Smooth transition for all properties */
+  backdrop-filter: none; /* No backdrop filter initially */
+  border-bottom: 1px solid transparent; /* Transparent border initially */
+}
+
+.navbar.active {
+  background: rgba(24, 24, 28, 0.85); /* Semi-transparent dark background */
+  backdrop-filter: blur(10px); /*  blur effect for modern look */
+  -webkit-backdrop-filter: blur(10px); /* Safari support */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+/* Home section with diagonal background (existing, no changes here) */
+.home-diagonal-container {
+  position: relative;
+  background: linear-gradient(
+    105deg, /* This angle creates the light gray left, black right diagonal */
+    #e5e7eb 0%,
+    #e5e7eb 45%,
+    #000 45%,
+    #000 100%
+  );
+  overflow: hidden;
+}
+
+/* Ensure content positioning */
+.home-content-left {
+  position: relative;
+  z-index: 2;
+}
+
+.home-content-right {
+  position: relative;
+  z-index: 2;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .home-diagonal-container {
+    background: linear-gradient(
+      180deg,
+      #e5e7eb 0%,
+      #e5e7eb 60%,
+      #000 60%,
+      #000 100%
+    );
+  }
+}
+
+/* About Section Diagonal Cut Styles */
+.about-diagonal-container {
+  position: relative;
+  /* 75deg: Black on the left, light gray on the right (diagonal from top-right to bottom-left) */
+  background: linear-gradient(
+    75deg, 
+    #000 0%, 
+    #000 50%, 
+    #e5e7eb 50%, 
+    #e5e7eb 100%
+  );
+  overflow: hidden;
+}
+
+/* Class for the top content layer that will be clipped */
+.about-content-clipped {
+    /* The clip-path needs to match the diagonal of the background */
+    /* 75deg background means black is on the left, light gray on the right. */
+    /* We want the black text (this layer) to be visible on the light gray background (right side). */
+    /* So, we clip the left side of this layer to reveal the white text underneath. */
+    /* The polygon points define the visible area. (x1 y1, x2 y2, x3 y3, x4 y4) */
+    /* For a diagonal from top-right to bottom-left that reveals the right side: */
+    /* (X% 0, 100% 0, 100% 100%, Y% 100%) */
+    /* X and Y will determine the slope and position of the diagonal cut. */
+    /* These values are a starting point to align with a 75deg slope. */
+    clip-path: polygon(40% 0, 100% 0, 100% 100%, 60% 100%);
+}
+
+
+/* Mobile responsive adjustments for About section */
+@media (max-width: 768px) {
+  .about-diagonal-container {
+    background: linear-gradient(
+      180deg, /* Straight vertical */
+      #000 0%,
+      #000 40%, /* Black top 40% */
+      #e5e7eb 40%, /* Light gray bottom 60% */
+      #e5e7eb 100%
+    );
+  }
+
+  /* Adjust clip-path for mobile vertical split */
+  .about-content-clipped {
+      /* For mobile, with a top-black, bottom-light-gray split. */
+      /* We want black text to be visible on the bottom light-gray part. */
+      /* So, clip the top part of this layer. */
+      clip-path: polygon(0 40%, 100% 40%, 100% 100%, 0 100%); /* Reveals bottom 60% */
+  }
+}
