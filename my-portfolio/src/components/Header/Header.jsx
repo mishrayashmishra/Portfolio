@@ -60,15 +60,31 @@ function Header() {
   const handleContactBtnClick = (e) => {
     e.preventDefault(); 
     e.stopPropagation();   
-  setShowContactModal((prev) => !prev);
-};
+    setShowContactModal((prev) => !prev);
+  };
 
   const handleNavClick = (sectionId) => {
-    const section = document.getElementById(sectionId);
-    if (section) {
-      section.scrollIntoView({ behavior: 'smooth' });
-    }
+    // Close menu
     setIsOpen(false);
+    
+    // Use requestAnimationFrame to ensure React has updated
+    requestAnimationFrame(() => {
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+        
+        // Adjust for fixed header
+        setTimeout(() => {
+          window.scrollBy({
+            top: -80,
+            behavior: 'smooth'
+          });
+        }, 50);
+      }
+    });
   };
 
   return (
@@ -103,56 +119,123 @@ function Header() {
           </nav>
           
           {/* Mobile Navbar Toggle */}
-          <div className="md:hidden ml-auto">
+          <div className="md:hidden ml-auto z-50">
             <button 
               onClick={toggleNavbar} 
-              className="text-white hover:text-gray-300 transition-colors duration-200 p-2"
+              className="text-white hover:text-gray-300 transition-colors duration-200 p-2 relative z-50"
             >
               {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Navbar Menu */}
+        {/* Mobile Navbar Menu - Fixed positioning */}
         <AnimatePresence>
           {isOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="bg-black/95 text-white md:hidden backdrop-blur-sm"
-            >
-              <motion.ul
-                initial={{ opacity: 0, y: -10 }}
+            <>
+              {/* Backdrop overlay */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+                onClick={() => setIsOpen(false)}
+              />
+              
+              {/* Dropdown Menu */}
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2, delay: 0.1 }}
-                className="flex flex-col items-center space-y-4 py-6"
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className="fixed left-0 right-0 top-[60px] mx-4 bg-gradient-to-b from-gray-900 to-black rounded-2xl shadow-2xl border border-white/10 z-40 md:hidden overflow-hidden"
               >
-                {navItems.map((item) => (
-                  <li key={item.id} className="relative">
-                    <button 
-                      onClick={() => handleNavClick(item.id)} 
-                      className="transition-colors duration-200 text-lg relative text-white hover:text-gray-300"
+                <motion.ul
+                  initial="closed"
+                  animate="open"
+                  exit="closed"
+                  variants={{
+                    open: {
+                      transition: { staggerChildren: 0.07, delayChildren: 0.1 }
+                    },
+                    closed: {
+                      transition: { staggerChildren: 0.05, staggerDirection: -1 }
+                    }
+                  }}
+                  className="flex flex-col py-4"
+                >
+                  {navItems.map((item, index) => (
+                    <motion.li 
+                      key={item.id}
+                      variants={{
+                        open: {
+                          y: 0,
+                          opacity: 1,
+                          transition: {
+                            y: { stiffness: 1000, velocity: -100 }
+                          }
+                        },
+                        closed: {
+                          y: -20,
+                          opacity: 0,
+                          transition: {
+                            y: { stiffness: 1000 }
+                          }
+                        }
+                      }}
+                      className="relative"
                     >
-                      {item.label}
-                    </button>
-                  </li>
-                ))}
-                <li className="pt-2">
-                  <button
-                    className="bg-white text-black px-6 py-2 rounded-full hover:bg-gray-200 transition-colors duration-200 font-medium"
-                    onClick={() => {
-                      setShowContactModal(true);
-                      setIsOpen(false);
+                      <button 
+                        onClick={() => handleNavClick(item.id)} 
+                        className="w-full text-center py-4 px-6 text-white text-lg font-medium hover:bg-white/5 transition-all duration-200 relative group"
+                      >
+                        <span className="relative z-10">{item.label}</span>
+                        <motion.div
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
+                          initial={{ x: '-100%' }}
+                          whileHover={{ x: '100%' }}
+                          transition={{ duration: 0.5 }}
+                        />
+                      </button>
+                      {index < navItems.length - 1 && (
+                        <div className="mx-6 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                      )}
+                    </motion.li>
+                  ))}
+                  
+                  <motion.li
+                    variants={{
+                      open: {
+                        y: 0,
+                        opacity: 1,
+                        transition: {
+                          y: { stiffness: 1000, velocity: -100 }
+                        }
+                      },
+                      closed: {
+                        y: -20,
+                        opacity: 0,
+                        transition: {
+                          y: { stiffness: 1000 }
+                        }
+                      }
                     }}
+                    className="pt-4 pb-2 px-6"
                   >
-                    CONTACT ME
-                  </button>
-                </li>
-              </motion.ul>
-            </motion.div>
+                    <button
+                      className="w-full bg-white text-black px-6 py-3 rounded-full hover:bg-gray-200 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
+                      onClick={() => {
+                        setShowContactModal(true);
+                        setIsOpen(false);
+                      }}
+                    >
+                      CONTACT ME
+                    </button>
+                  </motion.li>
+                </motion.ul>
+              </motion.div>
+            </>
           )}
         </AnimatePresence>
       </header>
